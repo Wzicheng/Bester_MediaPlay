@@ -7,6 +7,8 @@
       <module fileurl="file://$PROJECT_DIR$/startallplayer/startallplayer.iml" filepath="$PROJECT_DIR$/startallplayer/startallplayer.iml" />
       <module fileurl="file://$PROJECT_DIR$/vitamio/vitamio.iml" filepath="$PROJECT_DIR$/vitamio/vitamio.iml" />
       <module fileurl="file://$PROJECT_DIR$/vitamio-sample/vitamio-sample.iml" filepath="$PROJECT_DIR$/vitamio-sample/vitamio-sample.iml" />
+      <module fileurl="file://$PROJECT_DIR$/xutils/xutils.iml" filepath="$PROJECT_DIR$/xutils/xutils.iml" />
+      <module fileurl="file://$PROJECT_DIR$/xutils3-sample/xutils3-sample.iml" filepath="$PROJECT_DIR$/xutils3-sample/xutils3-sample.iml" />
     </modules>
   </component>
 </project>

@@ -1,7 +1,0 @@
-#Sun Sep 24 15:04:49 CST 2017
-base.0=E\:\\ASWorkspace\\Bester_MediaPlay\\vitamio-sample\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run_5a86bf5b21949e26ce0a4bbf061942dbbac7f002
-renamed.1=classes2.dex
-renamed.0=classes.dex
-file.1=E\:\\ASWorkspace\\Bester_MediaPlay\\vitamio-sample\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run-bootstrap_d171b6e4db84daba9598b6cac14f89521cc9b9aa\\classes.dex
-base.1=E\:\\ASWorkspace\\Bester_MediaPlay\\vitamio-sample\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run-bootstrap_d171b6e4db84daba9598b6cac14f89521cc9b9aa
-file.0=E\:\\ASWorkspace\\Bester_MediaPlay\\vitamio-sample\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run_5a86bf5b21949e26ce0a4bbf061942dbbac7f002\\classes.dex

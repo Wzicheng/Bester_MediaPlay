@@ -1109,5 +1109,4 @@ public class VitamioVideoPlayer extends Activity implements View.OnClickListener
         return super.onKeyDown(keyCode, event);
     }
 
-
 }
