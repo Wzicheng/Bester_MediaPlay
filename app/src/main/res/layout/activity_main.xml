@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!--顶部标题栏-->
+    <include layout="@layout/bester_topbar"/>
+
+    <!--中部内容 FrameLayout-->
+    <FrameLayout
+        android:id="@+id/fl_main"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+    </FrameLayout>
+    <!--底部导航栏 RadioGroup-->
+    <RadioGroup
+        android:background="#202125"
+        android:id="@+id/rg_bottom_tab"
+        android:paddingTop="5dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <RadioButton
+            android:id="@+id/rb_local_video"
+            android:drawableTop="@drawable/rb_local_video_drawable_selector"
+            android:text="@string/local_video"
+            style="@style/rb_bottom_tab"
+            />
+        <RadioButton
+            android:id="@+id/rb_local_audio"
+            android:drawableTop="@drawable/rb_local_audio_drawable_selector"
+            android:text="@string/local_audio"
+            style="@style/rb_bottom_tab"
+            />
+        <RadioButton
+            android:id="@+id/rb_net_video"
+            android:drawableTop="@drawable/rb_net_video_drawable_selector"
+            android:text="@string/net_video"
+            style="@style/rb_bottom_tab"
+            />
+        <RadioButton
+            android:id="@+id/rb_net_audio"
+            android:drawableTop="@drawable/rb_net_audio_drawable_selector"
+            android:text="@string/net_audio"
+            style="@style/rb_bottom_tab"
+            />
+
+
+    </RadioGroup>
+</LinearLayout>

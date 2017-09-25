@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Bester_MediaPlay.iml" filepath="$PROJECT_DIR$/Bester_MediaPlay.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/startallplayer/startallplayer.iml" filepath="$PROJECT_DIR$/startallplayer/startallplayer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/vitamio/vitamio.iml" filepath="$PROJECT_DIR$/vitamio/vitamio.iml" />
+      <module fileurl="file://$PROJECT_DIR$/vitamio-sample/vitamio-sample.iml" filepath="$PROJECT_DIR$/vitamio-sample/vitamio-sample.iml" />
+    </modules>
+  </component>
+</project>
