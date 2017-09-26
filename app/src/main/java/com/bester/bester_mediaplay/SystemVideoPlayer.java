@@ -1,6 +1,6 @@
 package com.bester.bester_mediaplay;
 
-import com.bester.bean.MedioBean;
+import com.bester.bean.MediaItem;
 import com.bester.tools.Utils;
 import com.bester.view.VideoView;
 
@@ -36,6 +36,8 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import static com.bester.bester_mediaplay.R.id.system_video_name;
 
 
 /**
@@ -213,7 +215,7 @@ public class SystemVideoPlayer extends Activity implements View.OnClickListener{
 
                     //监听卡
                     if (!isUseSystem){
-                        if (mVvVideoPlayer.isPlaying() && current_time > 1000){
+                        if (mVvVideoPlayer.isPlaying()){
                             int buffer = current_time - pre_time;
                             if (buffer < 500){ //卡顿
                                 if (isNetUri){
@@ -283,13 +285,13 @@ public class SystemVideoPlayer extends Activity implements View.OnClickListener{
     /**
      * 视频列表
      */
-    private ArrayList<MedioBean> video_list;
+    private ArrayList<MediaItem> mediaItems;
     private int position;
     private Uri uri;
     private void getData() {
         //得到播放地址
         uri = getIntent().getData();
-        video_list = (ArrayList<MedioBean>) getIntent().getSerializableExtra("video_list");
+        mediaItems = (ArrayList<MediaItem>) getIntent().getSerializableExtra("mediaItems");
         position = getIntent().getIntExtra("position",0);
 
         //得到手机屏幕的宽高
@@ -308,8 +310,8 @@ public class SystemVideoPlayer extends Activity implements View.OnClickListener{
     }
 
     private void setButtonState() {
-        if (video_list != null && video_list.size() > 0) {
-            if (video_list.size() == 1) {
+        if (mediaItems != null && mediaItems.size() > 0) {
+            if (mediaItems.size() == 1) {
                 setEnable(false);
             }
             else {
@@ -318,7 +320,7 @@ public class SystemVideoPlayer extends Activity implements View.OnClickListener{
                     mBtnPreBig.setEnabled(false);
                     mBtnNextBig.setBackgroundResource(R.drawable.btn_next_big_selector);
                     mBtnNextBig.setEnabled(true);
-                } else if (position == video_list.size() - 1) {
+                } else if (position == mediaItems.size() - 1) {
                     mBtnPreBig.setBackgroundResource(R.drawable.btn_pre_big_selector);
                     mBtnPreBig.setEnabled(true);
                     mBtnNextBig.setBackgroundResource(R.drawable.btn_next_big_unable);
@@ -359,8 +361,8 @@ public class SystemVideoPlayer extends Activity implements View.OnClickListener{
         mSoundSeekbar.setMax(maxSound);
         mSoundSeekbar.setProgress(systemSound);
 
-        if (video_list != null && video_list.size() > 0){
-            MedioBean video = video_list.get(position);//获得点击的列表中的某一视频
+        if (mediaItems != null && mediaItems.size() > 0){
+            MediaItem video = mediaItems.get(position);//获得点击的列表中的某一视频
             mSystemVideoName.setText(video.getName());//设置视频名称
             isNetUri = utils.isNetUri(video.getData());
             if (isNetUri){
@@ -398,140 +400,7 @@ public class SystemVideoPlayer extends Activity implements View.OnClickListener{
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         //实例化手势识别器，并重写双击，单击，拖拽方法
-        gestureDetector = new GestureDetector(this,new GestureDetector.SimpleOnGestureListener(){
-            @Override
-            public boolean onDoubleTap(MotionEvent e) {
-                judgeScreen();
-                return super.onDoubleTap(e);
-            }
-
-            @Override
-            public boolean onSingleTapConfirmed(MotionEvent e) {
-                if (isShowControl){
-                    setBtnPlay_Pause();
-                } else {
-                    showVideoControl();
-                }
-
-                return super.onSingleTapConfirmed(e);
-            }
-
-            @Override
-            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-                if (firstScroll) {// 判断是否是第一次触摸屏幕，避免在屏幕上操作切换混乱
-                    //横向的距离变化大则调整进度，纵向的变化大则调整音量
-                    if (Math.abs(distanceX) >= Math.abs(distanceY)) {
-                        GESTURE_FLAG = GESTURE_MODIFY_PROGRESS;
-                        setBtnPlay_Pause();
-                        showVideoControl();
-                        handler.removeMessages(HIDE_VIDEOCONTROL);
-                    } else if (Math.abs(distanceX) < Math.abs(distanceY)) {
-                        if (oldY > 20){//防止拖出系统自身状态栏时，误操作亮度音量控制
-                            if (oldX > 0 && oldX < 0.33 * screen_width ) {
-                                handler.removeMessages(HIDE_SOUNDCONTROL);
-                                mLlSound.setVisibility(View.GONE);
-                                GESTURE_FLAG = GESTURE_MODIFY_BRIGHT;
-                                mTvInformation.setVisibility(View.VISIBLE);
-                                mLlLight.setVisibility(View.VISIBLE);
-                            } else if (oldX > 0.66 * screen_width && oldX < screen_width) {
-                                handler.removeMessages(HIDE_SOUNDCONTROL);
-                                GESTURE_FLAG = GESTURE_MODIFY_SOUND;
-                                mTvInformation.setVisibility(View.VISIBLE);
-                                mLlSound.setVisibility(View.VISIBLE);
-                            }
-                        }
-                    }
-                    firstScroll = false;
-                }
-
-                    //调节进度
-                    int curProgress;
-                    int curBright;
-                    int curSound;
-                    if (GESTURE_FLAG == GESTURE_MODIFY_PROGRESS) {
-                        if (Math.abs(distanceX) > Math.abs(distanceY)) {
-                            if (distanceX < 0) {
-                                curProgress = mProgressControl.getProgress() + 1000;
-                                if (curProgress >= mProgressControl.getMax()) {
-                                    curProgress = mProgressControl.getMax();
-                                    mProgressControl.setProgress(curProgress);
-                                } else {
-                                    mProgressControl.setProgress(curProgress);
-                                }
-
-                            } else {
-                                curProgress = mProgressControl.getProgress() - 1000;
-                                if (curProgress <= 0) {
-                                    curProgress = 0;
-                                    mProgressControl.setProgress(curProgress);
-
-                                } else {
-                                    mProgressControl.setProgress(curProgress);
-                                }
-                            }
-                            mTvCurrentTime.setText(utils.stringForTime(mProgressControl.getProgress()));
-                            mVvVideoPlayer.seekTo(curProgress);
-                            if (mVvVideoPlayer.isPlaying()) {
-                                mBtnPlayOrPause.setBackgroundResource(R.drawable.btn_pause_selector);
-                            } else {
-                                mBtnPlayOrPause.setBackgroundResource(R.drawable.btn_play_selector);
-                            }
-                        }
-                    }
-                    //调节亮度
-                    else if (GESTURE_FLAG == GESTURE_MODIFY_BRIGHT) {
-                        if (Math.abs(distanceX) < Math.abs(distanceY)) {
-                            if (distanceY > 0) {
-                                curBright = mLightSeekbar.getProgress() + 5;
-                                if (curBright >= mLightSeekbar.getMax()) {
-                                    curBright = mLightSeekbar.getMax();
-                                }
-                            } else {
-                                curBright = mLightSeekbar.getProgress() - 5;
-                                if (curBright <= 0) {
-                                    curBright = 0;
-                                }
-                            }
-                            changeAppBrightness(curBright);
-                            int i = (int) (((double)curBright/255)*100);
-                            mTvInformation.setText("亮度：" + i + "%");
-                            mLightSeekbar.setProgress(curBright);
-                        }
-                    }
-                    //调节音量
-                    else if (GESTURE_FLAG == GESTURE_MODIFY_SOUND) {
-                        if (Math.abs(distanceX) < Math.abs(distanceY)) {
-                            if (distanceY > 0 ) {
-                                isMute = false;
-                                curSound = mSoundSeekbar.getProgress() + 1;
-                                if (curSound >= mSoundSeekbar.getMax()){
-                                    curSound = mSoundSeekbar.getMax();
-                                }
-
-                            } else {
-                                curSound = mSoundSeekbar.getProgress() - 1;
-                                if (curSound <= 0){
-                                    curSound = 0;
-                                    isMute = true;
-                                }
-                            }
-                            mSoundSeekbar.setProgress(curSound);
-                            changeAppSound(curSound,isMute);
-                            int i = (int) ((double)mSoundSeekbar.getProgress()/(double)mSoundSeekbar.getMax() * 100);
-                            mTvInformation.setText("音量：" + i + "%");
-                        }
-                    }
-            return super.onScroll(e1, e2, distanceX, distanceY);
-        }
-
-            @Override
-            public boolean onDown(MotionEvent e) {
-                oldX = e.getX();
-                oldY = e.getY();
-                firstScroll = true;
-                return super.onDown(e);
-            }
-        });
+        gestureDetector = new GestureDetector(this,new MySimpleOnGestureListener());
     }
 
     /**
@@ -659,10 +528,10 @@ public class SystemVideoPlayer extends Activity implements View.OnClickListener{
      * 下一个视频
      */
     private void getNextVideo() {
-        if (video_list != null && video_list.size() > 0){
+        if (mediaItems != null && mediaItems.size() > 0){
             position ++;
-            if (position < video_list.size()){
-                MedioBean video = video_list.get(position);
+            if (position < mediaItems.size()){
+                MediaItem video = mediaItems.get(position);
                 mSystemVideoName.setText(video.getName());
                 isNetUri = utils.isNetUri(video.getData());
                 if (isNetUri){
@@ -681,16 +550,18 @@ public class SystemVideoPlayer extends Activity implements View.OnClickListener{
             }
             setButtonState();
         }
+        handler.removeMessages(HIDE_VIDEOCONTROL);
+        handler.sendEmptyMessageDelayed(HIDE_VIDEOCONTROL,4000);
     }
 
     /**
      * 上一个视频
      */
     private void getPreVideo() {
-        if (video_list != null && video_list.size() > 0){
+        if (mediaItems != null && mediaItems.size() > 0){
             position --;
             if (position >=0 ){
-                MedioBean video = video_list.get(position);
+                MediaItem video = mediaItems.get(position);
                 mSystemVideoName.setText(video.getName());
                 isNetUri = utils.isNetUri(video.getData());
                 if (isNetUri){
@@ -709,6 +580,8 @@ public class SystemVideoPlayer extends Activity implements View.OnClickListener{
             }
             setButtonState();
         }
+        handler.removeMessages(HIDE_VIDEOCONTROL);
+        handler.sendEmptyMessageDelayed(HIDE_VIDEOCONTROL,4000);
     }
 
     /**
@@ -826,9 +699,9 @@ public class SystemVideoPlayer extends Activity implements View.OnClickListener{
         if (mVvVideoPlayer != null){
             mVvVideoPlayer.stopPlayback();
         }
-        if (video_list != null && video_list.size() > 0 ){
+        if (mediaItems != null && mediaItems.size() > 0 ){
             Bundle bundle = new Bundle();
-            bundle.putSerializable("video_list",video_list);
+            bundle.putSerializable("mediaItems",mediaItems);
             intent.putExtras(bundle);
             intent.putExtra("position",position);
         } else if (uri != null){
@@ -844,7 +717,7 @@ public class SystemVideoPlayer extends Activity implements View.OnClickListener{
     class MyOnCompletionListener implements MediaPlayer.OnCompletionListener {
         @Override
         public void onCompletion(MediaPlayer mp) {
-            if (position + 1 <= video_list.size()-1){
+            if (position + 1 <= mediaItems.size()-1){
                 position += 1;
             } else {
                 position = 0;
@@ -854,8 +727,9 @@ public class SystemVideoPlayer extends Activity implements View.OnClickListener{
                 mBtnNextBig.setEnabled(true);
             }
 
-            MedioBean video = video_list.get(position);
+            MediaItem video = mediaItems.get(position);
             mVvVideoPlayer.setVideoPath(video.getData());
+            mSystemVideoName.setText(video.getName());
         }
     }
 
@@ -885,7 +759,7 @@ public class SystemVideoPlayer extends Activity implements View.OnClickListener{
      */
     private void initView() {
         mVvVideoPlayer = (VideoView) findViewById(R.id.vv_video_player);
-        mSystemVideoName = (TextView) findViewById(R.id.system_video_name);
+        mSystemVideoName = (TextView) findViewById(system_video_name);
         mIvBattery = (ImageView) findViewById(R.id.iv_battery);
         mTvTime = (TextView) findViewById(R.id.tv_time);
         mLlSound = (LinearLayout) findViewById(R.id.ll_sound);
@@ -1061,6 +935,7 @@ public class SystemVideoPlayer extends Activity implements View.OnClickListener{
 
     @Override
     protected void onDestroy() {
+        handler.removeCallbacksAndMessages(null);
         //释放资源的时候先释放子类的资源再释放父类的资源，否则可能出现空指针异常
         if (myReceiver != null){
             unregisterReceiver(myReceiver);
@@ -1136,4 +1011,138 @@ public class SystemVideoPlayer extends Activity implements View.OnClickListener{
     }
 
 
+    private class MySimpleOnGestureListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            judgeScreen();
+            return super.onDoubleTap(e);
+        }
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            if (isShowControl){
+                setBtnPlay_Pause();
+            } else {
+                showVideoControl();
+            }
+
+            return super.onSingleTapConfirmed(e);
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            if (firstScroll) {// 判断是否是第一次触摸屏幕，避免在屏幕上操作切换混乱
+                //横向的距离变化大则调整进度，纵向的变化大则调整音量
+                if (Math.abs(distanceX) >= Math.abs(distanceY)) {
+                    GESTURE_FLAG = GESTURE_MODIFY_PROGRESS;
+                    setBtnPlay_Pause();
+                    showVideoControl();
+                    handler.removeMessages(HIDE_VIDEOCONTROL);
+                } else if (Math.abs(distanceX) < Math.abs(distanceY)) {
+                    if (oldY > 20){//防止拖出系统自身状态栏时，误操作亮度音量控制
+                        if (oldX > 0 && oldX < 0.33 * screen_width ) {
+                            handler.removeMessages(HIDE_SOUNDCONTROL);
+                            mLlSound.setVisibility(View.GONE);
+                            GESTURE_FLAG = GESTURE_MODIFY_BRIGHT;
+                            mTvInformation.setVisibility(View.VISIBLE);
+                            mLlLight.setVisibility(View.VISIBLE);
+                        } else if (oldX > 0.66 * screen_width && oldX < screen_width) {
+                            handler.removeMessages(HIDE_SOUNDCONTROL);
+                            GESTURE_FLAG = GESTURE_MODIFY_SOUND;
+                            mTvInformation.setVisibility(View.VISIBLE);
+                            mLlSound.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+                firstScroll = false;
+            }
+
+            //调节进度
+            int curProgress;
+            int curBright;
+            int curSound;
+            if (GESTURE_FLAG == GESTURE_MODIFY_PROGRESS) {
+                if (Math.abs(distanceX) > Math.abs(distanceY)) {
+                    if (distanceX < 0) {
+                        curProgress = mProgressControl.getProgress() + 1000;
+                        if (curProgress >= mProgressControl.getMax()) {
+                            curProgress = mProgressControl.getMax();
+                            mProgressControl.setProgress(curProgress);
+                        } else {
+                            mProgressControl.setProgress(curProgress);
+                        }
+
+                    } else {
+                        curProgress = mProgressControl.getProgress() - 1000;
+                        if (curProgress <= 0) {
+                            curProgress = 0;
+                            mProgressControl.setProgress(curProgress);
+
+                        } else {
+                            mProgressControl.setProgress(curProgress);
+                        }
+                    }
+                    mTvCurrentTime.setText(utils.stringForTime(mProgressControl.getProgress()));
+                    mVvVideoPlayer.seekTo(curProgress);
+                    if (mVvVideoPlayer.isPlaying()) {
+                        mBtnPlayOrPause.setBackgroundResource(R.drawable.btn_pause_selector);
+                    } else {
+                        mBtnPlayOrPause.setBackgroundResource(R.drawable.btn_play_selector);
+                    }
+                }
+            }
+            //调节亮度
+            else if (GESTURE_FLAG == GESTURE_MODIFY_BRIGHT) {
+                if (Math.abs(distanceX) < Math.abs(distanceY)) {
+                    if (distanceY > 0) {
+                        curBright = mLightSeekbar.getProgress() + 5;
+                        if (curBright >= mLightSeekbar.getMax()) {
+                            curBright = mLightSeekbar.getMax();
+                        }
+                    } else {
+                        curBright = mLightSeekbar.getProgress() - 5;
+                        if (curBright <= 0) {
+                            curBright = 0;
+                        }
+                    }
+                    changeAppBrightness(curBright);
+                    int i = (int) (((double)curBright/255)*100);
+                    mTvInformation.setText("亮度：" + i + "%");
+                    mLightSeekbar.setProgress(curBright);
+                }
+            }
+            //调节音量
+            else if (GESTURE_FLAG == GESTURE_MODIFY_SOUND) {
+                if (Math.abs(distanceX) < Math.abs(distanceY)) {
+                    if (distanceY > 0 ) {
+                        isMute = false;
+                        curSound = mSoundSeekbar.getProgress() + 1;
+                        if (curSound >= mSoundSeekbar.getMax()){
+                            curSound = mSoundSeekbar.getMax();
+                        }
+
+                    } else {
+                        curSound = mSoundSeekbar.getProgress() - 1;
+                        if (curSound <= 0){
+                            curSound = 0;
+                            isMute = true;
+                        }
+                    }
+                    mSoundSeekbar.setProgress(curSound);
+                    changeAppSound(curSound,isMute);
+                    int i = (int) ((double)mSoundSeekbar.getProgress()/(double)mSoundSeekbar.getMax() * 100);
+                    mTvInformation.setText("音量：" + i + "%");
+                }
+            }
+            return super.onScroll(e1, e2, distanceX, distanceY);
+        }
+
+        @Override
+        public boolean onDown(MotionEvent e) {
+            oldX = e.getX();
+            oldY = e.getY();
+            firstScroll = true;
+            return super.onDown(e);
+        }
+    }
 }

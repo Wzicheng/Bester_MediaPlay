@@ -30,7 +30,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bester.bean.MedioBean;
+import com.bester.bean.MediaItem;
 import com.bester.tools.Utils;
 import com.bester.view.VitamioVideoView;
 
@@ -40,7 +40,6 @@ import java.util.Date;
 
 import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.Vitamio;
-import io.vov.vitamio.widget.VideoView;
 
 
 /**
@@ -283,13 +282,13 @@ public class VitamioVideoPlayer extends Activity implements View.OnClickListener
     /**
      * 视频列表
      */
-    private ArrayList<MedioBean> video_list;
+    private ArrayList<MediaItem> mediaItems;
     private int position;
     private Uri uri;
     private void getData() {
         //得到播放地址
         uri = getIntent().getData();
-        video_list = (ArrayList<MedioBean>) getIntent().getSerializableExtra("video_list");
+        mediaItems = (ArrayList<MediaItem>) getIntent().getSerializableExtra("mediaItems");
         position = getIntent().getIntExtra("position",0);
 
         //得到手机屏幕的宽高
@@ -308,8 +307,8 @@ public class VitamioVideoPlayer extends Activity implements View.OnClickListener
     }
 
     private void setButtonState() {
-        if (video_list != null && video_list.size() > 0) {
-            if (video_list.size() == 1) {
+        if (mediaItems != null && mediaItems.size() > 0) {
+            if (mediaItems.size() == 1) {
                 setEnable(false);
             }
             else {
@@ -318,7 +317,7 @@ public class VitamioVideoPlayer extends Activity implements View.OnClickListener
                     mBtnPreBig.setEnabled(false);
                     mBtnNextBig.setBackgroundResource(R.drawable.btn_next_big_selector);
                     mBtnNextBig.setEnabled(true);
-                } else if (position == video_list.size() - 1) {
+                } else if (position == mediaItems.size() - 1) {
                     mBtnPreBig.setBackgroundResource(R.drawable.btn_pre_big_selector);
                     mBtnPreBig.setEnabled(true);
                     mBtnNextBig.setBackgroundResource(R.drawable.btn_next_big_unable);
@@ -359,8 +358,8 @@ public class VitamioVideoPlayer extends Activity implements View.OnClickListener
         mSoundSeekbar.setMax(maxSound);
         mSoundSeekbar.setProgress(systemSound);
 
-        if (video_list != null && video_list.size() > 0){
-            MedioBean video = video_list.get(position);//获得点击的列表中的某一视频
+        if (mediaItems != null && mediaItems.size() > 0){
+            MediaItem video = mediaItems.get(position);//获得点击的列表中的某一视频
             mSystemVideoName.setText(video.getName());//设置视频名称
             isNetUri = utils.isNetUri(video.getData());
             mVvVideoPlayer.setVideoPath(video.getData());//设置视频播放位置
@@ -656,10 +655,10 @@ public class VitamioVideoPlayer extends Activity implements View.OnClickListener
      * 下一个视频
      */
     private void getNextVideo() {
-        if (video_list != null && video_list.size() > 0){
+        if (mediaItems != null && mediaItems.size() > 0){
             position ++;
-            if (position < video_list.size()){
-                MedioBean video = video_list.get(position);
+            if (position < mediaItems.size()){
+                MediaItem video = mediaItems.get(position);
                 mSystemVideoName.setText(video.getName());
                 isNetUri = utils.isNetUri(video.getData());
                 mVvVideoPlayer.setVideoPath(video.getData());
@@ -678,10 +677,10 @@ public class VitamioVideoPlayer extends Activity implements View.OnClickListener
      * 上一个视频
      */
     private void getPreVideo() {
-        if (video_list != null && video_list.size() > 0){
+        if (mediaItems != null && mediaItems.size() > 0){
             position --;
             if (position >=0 ){
-                MedioBean video = video_list.get(position);
+                MediaItem video = mediaItems.get(position);
                 mSystemVideoName.setText(video.getName());
                 isNetUri = utils.isNetUri(video.getData());
                 mVvVideoPlayer.setVideoPath(video.getData());
@@ -820,7 +819,7 @@ public class VitamioVideoPlayer extends Activity implements View.OnClickListener
     class MyOnCompletionListener implements MediaPlayer.OnCompletionListener {
         @Override
         public void onCompletion(MediaPlayer mp) {
-            if (position + 1 <= video_list.size()-1){
+            if (position + 1 <= mediaItems.size()-1){
                 position += 1;
             } else {
                 position = 0;
@@ -830,8 +829,9 @@ public class VitamioVideoPlayer extends Activity implements View.OnClickListener
                 mBtnNextBig.setEnabled(true);
             }
 
-            MedioBean video = video_list.get(position);
+            MediaItem video = mediaItems.get(position);
             mVvVideoPlayer.setVideoPath(video.getData());
+            mSystemVideoName.setText(video.getName());
         }
     }
 
@@ -924,9 +924,10 @@ public class VitamioVideoPlayer extends Activity implements View.OnClickListener
         public void onStopTrackingTouch(SeekBar seekBar) {
             if (!mVvVideoPlayer.isPlaying()){
                 mVvVideoPlayer.start();
-                mBtnPlayOrPause.setBackgroundResource(R.drawable.btn_pause_selector);
             }
+            mBtnPlayOrPause.setBackgroundResource(R.drawable.btn_pause_selector);
             handler.sendEmptyMessage(PROGRESS);
+            handler.sendEmptyMessageDelayed(HIDE_VIDEOCONTROL,4000);
         }
     }
 

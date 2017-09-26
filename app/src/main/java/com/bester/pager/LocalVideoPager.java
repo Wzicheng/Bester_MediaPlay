@@ -9,27 +9,21 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.text.format.Formatter;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bester.adapter.VideoAdapter;
 import com.bester.base.BasePager;
-import com.bester.bean.MedioBean;
+import com.bester.bean.MediaItem;
 import com.bester.bester_mediaplay.R;
 import com.bester.bester_mediaplay.SystemVideoPlayer;
 import com.bester.tools.LogUtil;
 import com.bester.tools.Utils;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static com.bester.bester_mediaplay.R.id.list_video;
 
@@ -49,16 +43,16 @@ public class LocalVideoPager extends BasePager {
     /**
      * 装载数据集合
      */
-    private ArrayList<MedioBean> video_list;
+    private ArrayList<MediaItem> mediaItems;
 
     private Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            if (video_list != null && video_list.size() > 0){
+            if (mediaItems != null && mediaItems.size() > 0){
                 //获取到数据，隐藏文本，设置适配器
                 mTvNovideo.setVisibility(View.GONE);
-                adapter = new VideoAdapter(context,video_list);
+                adapter = new VideoAdapter(context,mediaItems);
                 mListVideo.setAdapter(adapter);
             } else {
                 //未获取到数据，显示文本
@@ -103,7 +97,7 @@ public class LocalVideoPager extends BasePager {
      * 2.从内容提供者中获取视频
      */
     private void getLocalVideo() {
-        video_list = new ArrayList<>();
+        mediaItems = new ArrayList<>();
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -119,8 +113,8 @@ public class LocalVideoPager extends BasePager {
                 Cursor cursor = resolver.query(uri,objs,null,null,null);
                 if (cursor != null){
                     while (cursor.moveToNext()){
-                        MedioBean medio = new MedioBean();
-                        video_list.add(medio);
+                        MediaItem medio = new MediaItem();
+                        mediaItems.add(medio);
 
                         String name = cursor.getString(0);//视频名称
                         medio.setName(name);
@@ -147,7 +141,6 @@ public class LocalVideoPager extends BasePager {
     private class MyOnItemClickListener implements android.widget.AdapterView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            MedioBean medio = video_list.get(position);
 
             //调用系统播放器 - 隐式意图
 //            Intent intent = new Intent();
@@ -161,7 +154,7 @@ public class LocalVideoPager extends BasePager {
             //传递列表数据 - 对象 - 序列化
             Intent intent = new Intent(context,SystemVideoPlayer.class);
             Bundle bundle = new Bundle();
-            bundle.putSerializable("video_list",video_list);
+            bundle.putSerializable("mediaItems",mediaItems);
             intent.putExtras(bundle);
             intent.putExtra("position",position);
             context.startActivity(intent);

@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bester.bean.MedioBean;
+import com.bester.bean.MediaItem;
 import com.bester.bester_mediaplay.R;
 import com.bester.tools.Utils;
 
@@ -22,18 +22,18 @@ import java.util.ArrayList;
 public class VideoAdapter extends BaseAdapter {
 
     private final Context context;
-    private final ArrayList<MedioBean> video_list;
+    private final ArrayList<MediaItem> mediaItems;
     private Utils utils;
 
-    public VideoAdapter(Context context, ArrayList<MedioBean> video_list) {
+    public VideoAdapter(Context context, ArrayList<MediaItem> mediaItems) {
         this.context = context;
-        this.video_list = video_list;
+        this.mediaItems = mediaItems;
         utils = new Utils();
     }
 
     @Override
     public int getCount() {
-        return video_list.size();
+        return mediaItems.size();
     }
 
     @Override
@@ -63,10 +63,10 @@ public class VideoAdapter extends BaseAdapter {
         }
 
         //根据position得到列表中对应位置的数据
-        MedioBean medio = video_list.get(position);
-        holderView.tv_video_name.setText(medio.getName());
-        holderView.tv_video_duration.setText(utils.stringForTime((int) medio.getDuration()));
-        holderView.tv_video_size.setText(Formatter.formatFileSize(context,medio.getSize()));
+        MediaItem mediaItem = mediaItems.get(position);
+        holderView.tv_video_name.setText(mediaItem.getName());
+        holderView.tv_video_duration.setText(utils.stringForTime((int) mediaItem.getDuration()));
+        holderView.tv_video_size.setText(Formatter.formatFileSize(context,mediaItem.getSize()));
         return convertView;
     }
     static class HolderView{
