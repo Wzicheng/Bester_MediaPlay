@@ -72,6 +72,14 @@
             android:screenOrientation="landscape"
             android:configChanges="keyboardHidden|screenSize|orientation"/>
 
+        <activity android:name=".LocalAudioPlayerActivity" android:launchMode="singleTask"/>
+
+        <service android:name="com.bester.service.MusicPlayerService">
+            <intent-filter>
+                <action android:name="com.bester.mobileplay_OPENAUDIO"/>
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>

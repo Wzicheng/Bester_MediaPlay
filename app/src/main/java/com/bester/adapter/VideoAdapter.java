@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bester.base.BasePager;
 import com.bester.bean.MediaItem;
 import com.bester.bester_mediaplay.R;
 import com.bester.tools.Utils;
@@ -20,14 +21,15 @@ import java.util.ArrayList;
  */
 
 public class VideoAdapter extends BaseAdapter {
-
+    private final boolean isVideo;
     private final Context context;
     private final ArrayList<MediaItem> mediaItems;
     private Utils utils;
 
-    public VideoAdapter(Context context, ArrayList<MediaItem> mediaItems) {
+    public VideoAdapter(Context context, ArrayList<MediaItem> mediaItems,boolean isVideo) {
         this.context = context;
         this.mediaItems = mediaItems;
+        this.isVideo = isVideo;
         utils = new Utils();
     }
 
@@ -64,9 +66,16 @@ public class VideoAdapter extends BaseAdapter {
 
         //根据position得到列表中对应位置的数据
         MediaItem mediaItem = mediaItems.get(position);
+        if (!isVideo){ //音频
+            holderView.iv_video_image.setImageResource(R.drawable.icon_local_audio);
+
+        }
         holderView.tv_video_name.setText(mediaItem.getName());
         holderView.tv_video_duration.setText(utils.stringForTime((int) mediaItem.getDuration()));
         holderView.tv_video_size.setText(Formatter.formatFileSize(context,mediaItem.getSize()));
+        holderView.tv_video_artist.setText(mediaItem.getArtist());
+
+
         return convertView;
     }
     static class HolderView{

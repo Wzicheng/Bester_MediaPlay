@@ -29,5 +29,5 @@ dependencies {
     compile project(':vitamio')
     compile project(':xutils')
     compile files('libs/glide-3.7.0.jar')
-    compile files('libs/picasso-2.5.2.jar')
+    compile 'org.greenrobot:eventbus:3.0.0'
 }

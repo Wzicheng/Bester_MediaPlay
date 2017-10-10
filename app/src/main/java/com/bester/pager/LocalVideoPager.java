@@ -52,7 +52,7 @@ public class LocalVideoPager extends BasePager {
             if (mediaItems != null && mediaItems.size() > 0){
                 //获取到数据，隐藏文本，设置适配器
                 mTvNovideo.setVisibility(View.GONE);
-                adapter = new VideoAdapter(context,mediaItems);
+                adapter = new VideoAdapter(context,mediaItems,true);
                 mListVideo.setAdapter(adapter);
             } else {
                 //未获取到数据，显示文本

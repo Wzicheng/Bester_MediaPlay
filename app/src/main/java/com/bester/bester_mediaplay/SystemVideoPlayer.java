@@ -194,11 +194,12 @@ public class SystemVideoPlayer extends Activity implements View.OnClickListener{
 
                 case PROGRESS:
                     //得到当前播放进度，并设置到SeekBar
-                    int current_time = mVvVideoPlayer.getCurrentPosition();
+                    int current_time = 1000;
+                    current_time += mVvVideoPlayer.getCurrentPosition();
                     mProgressControl.setProgress(current_time);
 
                     //更新文本播放进度
-                    mTvCurrentTime.setText(utils.stringForTime(current_time + 1000));
+                    mTvCurrentTime.setText(utils.stringForTime(current_time));
 
                     //得到系统时间
                     mTvTime.setText(getSystemtTime());
