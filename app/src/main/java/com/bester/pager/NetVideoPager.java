@@ -3,6 +3,7 @@ package com.bester.pager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import com.bester.adapter.NetVideoAdapter;
 import com.bester.base.BasePager;
 import com.bester.bean.MediaItem;
+import com.bester.bester_mediaplay.IMusicPlayerService;
 import com.bester.bester_mediaplay.R;
 import com.bester.bester_mediaplay.SystemVideoPlayer;
 import com.bester.tools.CacheUtils;
@@ -36,6 +38,7 @@ import java.util.Date;
  */
 
 public class NetVideoPager extends BasePager {
+
     @ViewInject(R.id.net_list_video)
     private XListView mNetListVideo;
 

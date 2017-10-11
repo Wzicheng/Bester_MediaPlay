@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.RemoteException;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,10 +19,13 @@ import android.widget.TextView;
 import com.bester.adapter.VideoAdapter;
 import com.bester.base.BasePager;
 import com.bester.bean.MediaItem;
+import com.bester.bester_mediaplay.IMusicPlayerService;
 import com.bester.bester_mediaplay.R;
 import com.bester.bester_mediaplay.SystemVideoPlayer;
 import com.bester.tools.LogUtil;
 import com.bester.tools.Utils;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 
@@ -38,7 +42,6 @@ public class LocalVideoPager extends BasePager {
     private ProgressBar mPbLoading;
     private TextView mTvLoading;
     private VideoAdapter adapter;
-    private Utils utils;
 
     /**
      * 装载数据集合
@@ -141,24 +144,12 @@ public class LocalVideoPager extends BasePager {
     private class MyOnItemClickListener implements android.widget.AdapterView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-            //调用系统播放器 - 隐式意图
-//            Intent intent = new Intent();
-//            intent.setDataAndType(Uri.parse(medio.getData()),"video/*");
-//            context.startActivity(intent);
-
-            //调用自己写的播放器 - 显示意图
-//            Intent intent = new Intent(context,SystemVideoPlayer.class);
-//            intent.setDataAndType(Uri.parse(medio.getData()),"video/*");
-//            context.startActivity(intent);
-            //传递列表数据 - 对象 - 序列化
             Intent intent = new Intent(context,SystemVideoPlayer.class);
             Bundle bundle = new Bundle();
             bundle.putSerializable("mediaItems",mediaItems);
             intent.putExtras(bundle);
             intent.putExtra("position",position);
             context.startActivity(intent);
-
         }
     }
 }

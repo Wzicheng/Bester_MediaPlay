@@ -2,10 +2,14 @@ package com.bester.bester_mediaplay;
 
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.view.KeyEvent;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.bester.base.BasePager;
 import com.bester.pager.LocalAudioPager;
@@ -30,6 +34,7 @@ public class MainActivity extends FragmentActivity {
      * 页面位置
      */
     private int position;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +54,7 @@ public class MainActivity extends FragmentActivity {
         mRgBottomTab.check(R.id.rb_local_video);
 
     }
+
    class MyOnCheckedChangeListener implements RadioGroup.OnCheckedChangeListener {
         @Override
         public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -105,4 +111,32 @@ public class MainActivity extends FragmentActivity {
         mRgBottomTab = (RadioGroup) findViewById(R.id.rg_bottom_tab);
     }
 
+    /**
+     * 判断是否退出
+     */
+    private boolean isExit;
+
+    /**
+     * 添加双击退出功能
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK){
+            if (position != 0){
+                mRgBottomTab.check(R.id.rb_local_video);//首页
+                return true;
+            } else if (!isExit){
+                isExit = true;
+                Toast.makeText(MainActivity.this,"2秒内再次点击退出程序",Toast.LENGTH_SHORT).show();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        isExit = false;
+                    }
+                },2000);
+                return true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 }

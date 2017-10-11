@@ -2,6 +2,7 @@ package com.bester.tools;
 
 import com.bester.bean.Lyric;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;

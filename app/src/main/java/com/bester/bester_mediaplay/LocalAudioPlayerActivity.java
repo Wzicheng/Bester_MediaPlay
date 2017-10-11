@@ -33,7 +33,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.io.File;
 
 
-
 /**
  * Created by Wzich on 2017/9/26.
  */
@@ -82,8 +81,15 @@ public class LocalAudioPlayerActivity extends Activity implements View.OnClickLi
             service = IMusicPlayerService.Stub.asInterface(iBinder);
             if (service != null) {
                 try {
-                    if (!notification) {
-                        service.openAudio(position);
+                    if (!notification) {//不是来自通知
+                        if (isPlayingPos){
+                            LogUtil.e("true");
+                            showViewData();
+                        } else {
+                            LogUtil.e("false");
+                            service.openAudio(position);
+                        }
+
                     } else {
                         showViewData();
                     }
@@ -151,6 +157,11 @@ public class LocalAudioPlayerActivity extends Activity implements View.OnClickLi
     };
 
     private MyReceiver receiver;
+    /**
+     * 当前正在播放歌曲，是否与准备播放的歌曲相同
+     */
+    public boolean isPlayingPos;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -185,6 +196,7 @@ public class LocalAudioPlayerActivity extends Activity implements View.OnClickLi
         //发消息开始同步歌词
         showLyric();
         handler.sendEmptyMessage(SHOW_LYRIC);
+
         showViewData();
         setPlayModeStatue();
     }
@@ -216,6 +228,8 @@ public class LocalAudioPlayerActivity extends Activity implements View.OnClickLi
     }
 
     public void showViewData() {
+        showLyric();
+        handler.sendEmptyMessage(SHOW_LYRIC);
         try {
             mTvAudioArtist.setText(service.getArtist());
             mTvAudioName.setText(service.getName());
@@ -227,7 +241,7 @@ public class LocalAudioPlayerActivity extends Activity implements View.OnClickLi
         }
     }
 
-    private void bindAndStartService() {
+    public void bindAndStartService() {
         Intent intent = new Intent(this, MusicPlayerService.class);
         intent.setAction("com.bester.mobileplay_OPENAUDIO");
         bindService(intent, con, Context.BIND_AUTO_CREATE);
@@ -239,8 +253,10 @@ public class LocalAudioPlayerActivity extends Activity implements View.OnClickLi
      */
     private void getData() {
         notification = getIntent().getBooleanExtra("Notification", false);
-        if (!notification) {
+        if (!notification) {//不是来自通知
             position = getIntent().getIntExtra("position", 0);
+            isPlayingPos = getIntent().getBooleanExtra("isPlayingPos",false);
+            LogUtil.e(isPlayingPos + "");
         }
     }
 
@@ -358,6 +374,17 @@ public class LocalAudioPlayerActivity extends Activity implements View.OnClickLi
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+
+        //校验播放按钮状态
+        try {
+            if (service.isPlaying()){
+                mBtnPlayOrPause.setBackgroundResource(R.drawable.btn_play_selector);
+            } else {
+                mBtnPlayOrPause.setBackgroundResource(R.drawable.btn_pause_selector);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setBtnPlay_Pause() {
@@ -401,7 +428,6 @@ public class LocalAudioPlayerActivity extends Activity implements View.OnClickLi
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
             handler.removeMessages(PROGRESS);
-
         }
 
         @Override

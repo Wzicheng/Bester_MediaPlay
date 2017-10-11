@@ -65,6 +65,15 @@ public class LocalAudioPager extends BasePager {
             mTvLoading.setVisibility(View.GONE);
         }
     };
+    /**
+     * 当前正在播放的歌曲，若无该值为-1
+     */
+    private int playingPos = -1;
+
+    /**
+     * 当前正在播放歌曲，是否与准备播放的歌曲相同
+     */
+    private boolean isPlayingPos;
 
     public LocalAudioPager(Context context) {
         super(context);
@@ -143,8 +152,16 @@ public class LocalAudioPager extends BasePager {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             //传递列表数据 - 对象 - 序列化
+
+            if (playingPos == position){
+                isPlayingPos = true;
+            } else{
+                isPlayingPos = false;
+                playingPos = position;
+            }
             Intent intent = new Intent(context,LocalAudioPlayerActivity.class);
             intent.putExtra("position",position);
+            intent.putExtra("isPlayingPos",isPlayingPos);
             context.startActivity(intent);
         }
     }

@@ -90,7 +90,4 @@ interface IMusicPlayerService {
      * @param position
      */
     void seekTo(int position);
-
-
-
 }

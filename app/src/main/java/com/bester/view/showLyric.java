@@ -163,7 +163,6 @@ public class ShowLyric extends TextView {
                 if (currentIndex >= lyrics.get(tempIndex).getTimePoint()){
                     //当前正在播放的歌词
                     index = tempIndex;
-                    LogUtil.e(index + "");
                     sleepTime = lyrics.get(index).getSleepTime();
                     timePoint = lyrics.get(index).getTimePoint();
                 }

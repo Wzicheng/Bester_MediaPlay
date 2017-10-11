@@ -10,12 +10,9 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/startallplayer" />
             <option value="$PROJECT_DIR$/vitamio" />
-            <option value="$PROJECT_DIR$/vitamio-sample" />
             <option value="$PROJECT_DIR$/xListView" />
             <option value="$PROJECT_DIR$/xutils" />
-            <option value="$PROJECT_DIR$/xutils3-sample" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
